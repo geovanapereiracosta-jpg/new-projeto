@@ -437,36 +437,140 @@
             <iframe width="560" height="315" src="https://www.youtube.com/embed/YU2yU1rTWfw?si=bkKgxBZ9ojRinGgD" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
 
-        <section id="relatos">
-            <div class="form-container">
-                <h3>Se você tiver algum fato ou curiosidade sobre Roncador, conte aqui!</h3>
-                <p>(Espaço opcional para compartilhar fatos, memórias ou curiosidades sobre o município)</p>
-                
-                <form id="storyForm">
-                    <div class="form-group">
-                        <label for="nome">Nome Completo (Opcional):</label>
-                        <input type="text" id="nome" placeholder="Seu nome (Deixe em branco para Anônimo)">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">E-mail de contato:</label>
-                        <input type="email" id="email" placeholder="exemplo@gmail.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="relato">Seu fato ou história:</label>
-                        <textarea id="relato" placeholder="Escreva aqui o que você sabe ou viveu em Roncador..." required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Enviar Relato</button>
-                </form>
+     <section id="relatos">
+    <div class="form-container">
+        <h3>Se você tiver algum fato ou curiosidade sobre Roncador, conte aqui!</h3>
+        <p>(Espaço opcional para compartilhar fatos, memórias ou curiosidades sobre o município)</p>
+        
+        <form id="storyForm">
+            <div class="form-group">
+                <label for="nome">Nome Completo (Opcional):</label>
+                <input type="text" id="nome" placeholder="Seu nome (Deixe em branco para Anônimo)">
             </div>
 
-            <div class="comments-section">
-                <h3>Relatos da Comunidade</h3>
-                <div id="commentsContainer"></div>
+            <div class="form-group">
+                <label for="email">E-mail de contato:</label>
+                <input type="email" id="email" placeholder="exemplo@gmail.com">
             </div>
-        </section>
+
+            <div class="form-group">
+                <label for="relato">Seu fato ou história:</label>
+                <textarea id="relato" placeholder="Escreva aqui o que você sabe ou viveu em Roncador..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Enviar Relato</button>
+        </form>
+    </div>
+
+    <div class="comments-section">
+        <h3>Relatos da Comunidade</h3>
+        <div id="commentsContainer"></div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", carregarComentarios);
+
+    document.getElementById('storyForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        let nomeInput = document.getElementById('nome').value.trim();
+        let relatoInput = document.getElementById('relato').value.trim();
+        let nomeAutor = nomeInput ? nomeInput : "Anônimo";
+
+        let idUnico = Date.now();
+        let objetoComentario = {
+            id: idUnico,
+            nome: nomeAutor,
+            texto: relatoInput
+        };
+
+        // Salva na lista de criados localmente ANTES de renderizar, 
+        // para que a função criarElementoComentario saiba que deve exibir o botão
+        salvarComoCriadorLocal(idUnico);
+
+        criarElementoComentario(objetoComentario);
+        salvarNoStorage(objetoComentario);
+        document.getElementById('storyForm').reset();
+    });
+
+    function criarElementoComentario(comentario) {
+        let novoComentario = document.createElement('div');
+        novoComentario.className = 'comment-card';
+        novoComentario.setAttribute('data-id', comentario.id);
+
+        let estruturaNome = document.createElement('div');
+        let estruturaTexto = document.createElement('p');
+        
+        estruturaNome.className = 'comment-author';
+        estruturaNome.innerText = comentario.nome;
+
+        estruturaTexto.className = 'comment-text';
+        estruturaTexto.innerText = comentario.texto;
+
+        novoComentario.appendChild(estruturaNome);
+        novoComentario.appendChild(estruturaTexto);
+
+        // --- MUDANÇA PRINCIPAL AQUI ---
+        // Verifica se o ID deste comentário está na lista de criados deste navegador
+        if (eCriadorDoComentario(comentario.id)) {
+            let botaoDeletar = document.createElement('button');
+            botaoDeletar.className = 'btn-delete';
+            botaoDeletar.innerText = 'Excluir';
+            botaoDeletar.onclick = function() {
+                excluirComentario(comentario.id);
+            };
+            novoComentario.appendChild(botaoDeletar);
+        }
+
+        let containerComentarios = document.getElementById('commentsContainer');
+        containerComentarios.insertBefore(novoComentario, containerComentarios.firstChild);
+    }
+
+    function salvarNoStorage(comentario) {
+        let comentariosExistentes = JSON.parse(localStorage.getItem('relatosRoncador')) || [];
+        comentariosExistentes.push(comentario);
+        localStorage.setItem('relatosRoncador', JSON.stringify(comentariosExistentes));
+    }
+
+    // Armazena os IDs dos comentários criados por este usuário/navegador
+    function salvarComoCriadorLocal(id) {
+        let meusComentarios = JSON.parse(localStorage.getItem('meusComentarios')) || [];
+        meusComentarios.push(id);
+        localStorage.setItem('meusComentarios', JSON.stringify(meusComentarios));
+    }
+
+    // Checa se o usuário atual é o autor do comentário
+    function eCriadorDoComentario(id) {
+        let meusComentarios = JSON.parse(localStorage.getItem('meusComentarios')) || [];
+        return meusComentarios.includes(id);
+    }
+
+    function carregarComentarios() {
+        let comentariosExistentes = JSON.parse(localStorage.getItem('relatosRoncador')) || [];
+        if (comentariosExistentes.length === 0) {
+            let padrao = { id: 1, nome: "Maria Silva", texto: "Meus avós chegaram em Roncador na década de 40..." };
+            comentariosExistentes.push(padrao);
+            localStorage.setItem('relatosRoncador', JSON.stringify(comentariosExistentes));
+        }
+        comentariosExistentes.forEach(comentario => criarElementoComentario(comentario));
+    }
+
+    function excluirComentario(id) {
+        let comentariosExistentes = JSON.parse(localStorage.getItem('relatosRoncador')) || [];
+        let listaFiltrada = comentariosExistentes.filter(c => c.id !== id);
+        localStorage.setItem('relatosRoncador', JSON.stringify(listaFiltrada));
+
+        // Remove também da lista local de controle do criador
+        let meusComentarios = JSON.parse(localStorage.getItem('meusComentarios')) || [];
+        let meusComentariosFiltrados = meusComentarios.filter(meuId => meuId !== id);
+        localStorage.setItem('meusComentarios', JSON.stringify(meusComentariosFiltrados));
+
+        let elementoNoHtml = document.querySelector(`[data-id='${id}']`);
+        if (elementoNoHtml) {
+            elementoNoHtml.remove();
+        }
+    }
 
     </div>
 
@@ -511,82 +615,6 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", carregarComentarios);
-
-        document.getElementById('storyForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            let nomeInput = document.getElementById('nome').value.trim();
-            let relatoInput = document.getElementById('relato').value.trim();
-            let nomeAutor = nomeInput ? nomeInput : "Anônimo";
-
-            let idUnico = Date.now();
-            let objetoComentario = {
-                id: idUnico,
-                nome: nomeAutor,
-                texto: relatoInput
-            };
-
-            criarElementoComentario(objetoComentario);
-            salvarNoStorage(objetoComentario);
-            document.getElementById('storyForm').reset();
-        });
-
-        function criarElementoComentario(comentario) {
-            let novoComentario = document.createElement('div');
-            novoComentario.className = 'comment-card';
-            novoComentario.setAttribute('data-id', comentario.id);
-
-            let estruturaNome = document.createElement('div');
-            estruturaNome.className = 'comment-author';
-            estruturaNome.innerText = comentario.nome;
-
-            let estruturaTexto = document.createElement('p');
-            estruturaTexto.className = 'comment-text';
-            estruturaTexto.innerText = comentario.texto;
-
-            let botaoDeletar = document.createElement('button');
-            botaoDeletar.className = 'btn-delete';
-            botaoDeletar.innerText = 'Excluir';
-            botaoDeletar.onclick = function() {
-                excluirComentario(comentario.id);
-            };
-
-            novoComentario.appendChild(estruturaNome);
-            novoComentario.appendChild(estruturaTexto);
-            novoComentario.appendChild(botaoDeletar);
-
-            let containerComentarios = document.getElementById('commentsContainer');
-            containerComentarios.insertBefore(novoComentario, containerComentarios.firstChild);
-        }
-
-        function salvarNoStorage(comentario) {
-            let comentariosExistentes = JSON.parse(localStorage.getItem('relatosRoncador')) || [];
-            comentariosExistentes.push(comentario);
-            localStorage.setItem('relatosRoncador', JSON.stringify(comentariosExistentes));
-        }
-
-        function carregarComentarios() {
-            let comentariosExistentes = JSON.parse(localStorage.getItem('relatosRoncador')) || [];
-            if (comentariosExistentes.length === 0) {
-                let padrao = { id: 1, nome: "Maria Silva", texto: "Meus avós chegaram em Roncador na década de 40..." };
-                comentariosExistentes.push(padrao);
-                localStorage.setItem('relatosRoncador', JSON.stringify(comentariosExistentes));
-            }
-            comentariosExistentes.forEach(comentario => criarElementoComentario(comentario));
-        }
-
-        function excluirComentario(id) {
-            let comentariosExistentes = JSON.parse(localStorage.getItem('relatosRoncador')) || [];
-            let listaFiltrada = comentariosExistentes.filter(c => c.id !== id);
-            localStorage.setItem('relatosRoncador', JSON.stringify(listaFiltrada));
-
-            let elementoNoHtml = document.querySelector(`[data-id='${id}']`);
-            if (elementoNoHtml) {
-                elementoNoHtml.remove();
-            }
-        }
     </script>
 </body>
 </html>
