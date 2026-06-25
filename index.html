@@ -419,16 +419,28 @@
             <iframe width="560" height="315" src="https://www.youtube.com/embed/YU2yU1rTWfw?si=bkKgxBZ9ojRinGgD" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
 
-        <div>
-<script>
-    document.addEventListener("DOMContentLoaded", carregarComentarios);
+        <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        carregarComentarios();
+        verificarPerfilSalvo(); // Verifica se o usuário já tem cadastro opcional
+    });
 
+    // --- LOGICA DO FORMULÁRIO DE RELATOS ---
     document.getElementById('storyForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
         let nomeInput = document.getElementById('nome').value.trim();
         let relatoInput = document.getElementById('relato').value.trim();
-        let nomeAutor = nomeInput ? nomeInput : "Anônimo";
+        
+        // Se o input estiver vazio, tenta usar o nome do cadastro opcional. Se não houver, usa "Anônimo".
+        let perfilSalvo = JSON.parse(localStorage.getItem('perfilRoncador'));
+        let nomeAutor = "Anônimo";
+        
+        if (nomeInput) {
+            nomeAutor = nomeInput;
+        } else if (perfilSalvo && perfilSalvo.nome) {
+            nomeAutor = perfilSalvo.nome;
+        }
 
         let idUnico = Date.now();
         let objetoComentario = {
@@ -437,15 +449,12 @@
             texto: relatoInput
         };
 
-        // Salva na lista de criados localmente antes de renderizar
         salvarComoCriadorLocal(idUnico);
-
         salvarNoStorage(objetoComentario);
-        
-        // Em vez de chamar criarElementoComentario isolado, recarregamos para manter a ordem correta
         carregarComentarios(); 
         
         document.getElementById('storyForm').reset();
+        verificarPerfilSalvo(); // Re-aplica o placeholder/nome caso haja perfil salvo
     });
 
     function criarElementoComentario(comentario) {
@@ -465,7 +474,6 @@
         novoComentario.appendChild(estruturaNome);
         novoComentario.appendChild(estruturaTexto);
 
-        // Verifica se o ID deste comentário está na lista de criados deste navegador
         if (eCriadorDoComentario(comentario.id)) {
             let botaoDeletar = document.createElement('button');
             botaoDeletar.className = 'btn-delete';
@@ -477,7 +485,6 @@
         }
 
         let containerComentarios = document.getElementById('commentsContainer');
-        // Insere sempre no topo do container
         containerComentarios.insertBefore(novoComentario, containerComentarios.firstChild);
     }
 
@@ -487,21 +494,18 @@
         localStorage.setItem('relatosRoncador', JSON.stringify(comentariosExistentes));
     }
 
-    // Armazena os IDs dos comentários criados por este usuário/navegador
     function salvarComoCriadorLocal(id) {
         let meusComentarios = JSON.parse(localStorage.getItem('meusComentarios')) || [];
         meusComentarios.push(id);
         localStorage.setItem('meusComentarios', JSON.stringify(meusComentarios));
     }
 
-    // Checa se o usuário atual é o autor do comentário
     function eCriadorDoComentario(id) {
         let meusComentarios = JSON.parse(localStorage.getItem('meusComentarios')) || [];
         return meusComentarios.includes(id);
     }
 
     function carregarComentarios() {
-        // CORREÇÃO: Limpa o container para não duplicar os elementos ao recarregar/atualizar
         let containerComentarios = document.getElementById('commentsContainer');
         containerComentarios.innerHTML = "";
 
@@ -513,16 +517,15 @@
             localStorage.setItem('relatosRoncador', JSON.stringify(comentariosExistentes));
         }
         
-        // Renderiza os comentários na tela
         comentariosExistentes.forEach(comentario => criarElementoComentario(comentario));
     }
 
     function excluirComentario(id) {
         let comentariosExistentes = JSON.parse(localStorage.getItem('relatosRoncador')) || [];
         let listaFiltrada = comentariosExistentes.filter(c => c.id !== id);
+        localStorage.setItem('localStorage', JSON.stringify(listaFiltrada));
         localStorage.setItem('relatosRoncador', JSON.stringify(listaFiltrada));
 
-        // Remove também da lista local de controle do criador
         let meusComentarios = JSON.parse(localStorage.getItem('meusComentarios')) || [];
         let meusComentariosFiltrados = meusComentarios.filter(meuId => meuId !== id);
         localStorage.setItem('meusComentarios', JSON.stringify(meusComentariosFiltrados));
@@ -532,8 +535,38 @@
             elementoNoHtml.remove();
         }
     }
+
+    // --- NOVA LÓGICA: CADASTRO OPCIONAL DO PERFIL ---
+    function salvarPerfilOpcional(nome, email) {
+        if(!nome) {
+            alert("Por favor, digite ao menos um nome para salvar o perfil.");
+            return;
+        }
+        let perfil = { nome: nome, email: email };
+        localStorage.setItem('perfilRoncador', JSON.stringify(perfil));
+        verificarPerfilSalvo();
+        alert("Perfil salvo localmente com sucesso!");
+    }
+
+    function limparPerfilOpcional() {
+        localStorage.removeItem('perfilRoncador');
+        document.getElementById('nome').placeholder = "Seu nome (Deixe em branco para Anônimo)";
+        alert("Cadastro removido.");
+        verificarPerfilSalvo();
+    }
+
+    function verificarPerfilSalvo() {
+        let perfilSalvo = JSON.parse(localStorage.getItem('perfilRoncador'));
+        let inputNomeRelato = document.getElementById('nome');
+        
+        if (perfilSalvo && perfilSalvo.nome) {
+            // Se o usuário já tem cadastro, avisa no campo de relato que ele está logado
+            if(inputNomeRelato) {
+                inputNomeRelato.placeholder = `Postando como: ${perfilSalvo.nome} (Ou digite outro)`;
+            }
+        }
+    }
 </script>
-    </div>
 
     <footer class="site-footer">
         <div class="footer-container">
