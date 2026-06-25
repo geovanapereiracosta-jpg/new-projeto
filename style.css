@@ -76,6 +76,21 @@
             margin: 20px auto;         
         }
 
+.gallery {
+    display: flex;          /* Ativa o modo flexível */
+    flex-direction: row;    /* Força os elementos a ficarem lado a lado */
+    justify-content: center; /* Centraliza as imagens na tela (mude para flex-start se quiser alinhadas à esquerda) */
+    gap: 20px;              /* Cria um espaçamento de 20px entre as imagens */
+    flex-wrap: wrap;        /* Permite que elas quebrem de linha em telas pequenas (como celulares) */
+    padding: 20px;
+}
+
+.gallery img {
+    max-width: 100%;        /* Garante que a imagem não mude de tamanho de forma desproporcional */
+    height: auto;           /* Mantém a proporção da altura automaticamente */
+    border-radius: 8px;     /* Opcional: deixa as bordas arredondadas para um visual mais bonito */
+}
+
         h2, h3, h4 {
             text-align: center;
             margin-top: 40px;
