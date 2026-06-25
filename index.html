@@ -437,37 +437,7 @@
             <iframe width="560" height="315" src="https://www.youtube.com/embed/YU2yU1rTWfw?si=bkKgxBZ9ojRinGgD" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
 
-     <section id="relatos">
-    <div class="form-container">
-        <h3>Se você tiver algum fato ou curiosidade sobre Roncador, conte aqui!</h3>
-        <p>(Espaço opcional para compartilhar fatos, memórias ou curiosidades sobre o município)</p>
-        
-        <form id="storyForm">
-            <div class="form-group">
-                <label for="nome">Nome Completo (Opcional):</label>
-                <input type="text" id="nome" placeholder="Seu nome (Deixe em branco para Anônimo)">
-            </div>
-
-            <div class="form-group">
-                <label for="email">E-mail de contato:</label>
-                <input type="email" id="email" placeholder="exemplo@gmail.com">
-            </div>
-
-            <div class="form-group">
-                <label for="relato">Seu fato ou história:</label>
-                <textarea id="relato" placeholder="Escreva aqui o que você sabe ou viveu em Roncador..." required></textarea>
-            </div>
-
-            <button type="submit" class="btn-submit">Enviar Relato</button>
-        </form>
-    </div>
-
-    <div class="comments-section">
-        <h3>Relatos da Comunidade</h3>
-        <div id="commentsContainer"></div>
-    </div>
-</section>
-
+        <div>
 <script>
     document.addEventListener("DOMContentLoaded", carregarComentarios);
 
@@ -485,12 +455,14 @@
             texto: relatoInput
         };
 
-        // Salva na lista de criados localmente ANTES de renderizar, 
-        // para que a função criarElementoComentario saiba que deve exibir o botão
+        // Salva na lista de criados localmente antes de renderizar
         salvarComoCriadorLocal(idUnico);
 
-        criarElementoComentario(objetoComentario);
         salvarNoStorage(objetoComentario);
+        
+        // Em vez de chamar criarElementoComentario isolado, recarregamos para manter a ordem correta
+        carregarComentarios(); 
+        
         document.getElementById('storyForm').reset();
     });
 
@@ -511,7 +483,6 @@
         novoComentario.appendChild(estruturaNome);
         novoComentario.appendChild(estruturaTexto);
 
-        // --- MUDANÇA PRINCIPAL AQUI ---
         // Verifica se o ID deste comentário está na lista de criados deste navegador
         if (eCriadorDoComentario(comentario.id)) {
             let botaoDeletar = document.createElement('button');
@@ -524,6 +495,7 @@
         }
 
         let containerComentarios = document.getElementById('commentsContainer');
+        // Insere sempre no topo do container
         containerComentarios.insertBefore(novoComentario, containerComentarios.firstChild);
     }
 
@@ -547,12 +519,19 @@
     }
 
     function carregarComentarios() {
+        // CORREÇÃO: Limpa o container para não duplicar os elementos ao recarregar/atualizar
+        let containerComentarios = document.getElementById('commentsContainer');
+        containerComentarios.innerHTML = "";
+
         let comentariosExistentes = JSON.parse(localStorage.getItem('relatosRoncador')) || [];
+        
         if (comentariosExistentes.length === 0) {
             let padrao = { id: 1, nome: "Maria Silva", texto: "Meus avós chegaram em Roncador na década de 40..." };
             comentariosExistentes.push(padrao);
             localStorage.setItem('relatosRoncador', JSON.stringify(comentariosExistentes));
         }
+        
+        // Renderiza os comentários na tela
         comentariosExistentes.forEach(comentario => criarElementoComentario(comentario));
     }
 
@@ -571,7 +550,7 @@
             elementoNoHtml.remove();
         }
     }
-
+</script>
     </div>
 
     <footer class="site-footer">
