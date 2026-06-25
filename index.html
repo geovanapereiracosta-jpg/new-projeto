@@ -421,47 +421,37 @@
 
 <section id="relatos">
     <div class="form-container">
+        <h3>Conte uma Curiosidade ou Fato sobre Roncador</h3>
+        <p>(Espaço para compartilhar memórias, histórias ou curiosidades sobre o município)</p>
         
-        <div class="cadastro-box" style="margin-bottom: 25px; border: 1px dashed #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
-            <h3 style="margin-top: 0;">1. Cadastro Opcional (Salvar meus dados)</h3>
-            <p style="font-size: 0.9em; color: #666;">Se quiser, salve seu nome aqui para assinar suas curiosidades automaticamente sem precisar digitar toda vez.</p>
-            
-            <div class="form-group" style="margin-bottom: 10px;">
-                <label for="cadastroNome">Seu Nome ou Apelido:</label>
-                <input type="text" id="cadastroNome" placeholder="Ex: João Silva" style="width: 100%; padding: 8px; margin-top: 5px;">
+        <form id="storyForm">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="nome">Seu Nome ou Apelido (Opcional):</label>
+                <input type="text" id="nome" placeholder="Seu nome (Deixe em branco para Anônimo)" style="width: 100%; padding: 8px; margin-top: 5px;">
             </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="email">E-mail de contato:</label>
+                <input type="email" id="email" placeholder="exemplo@gmail.com" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+
+            <div class="form-group checkbox-group" style="margin-bottom: 15px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px dashed #ccc;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.95em;">
+                    <input type="checkbox" id="salvarCadastro" style="cursor: pointer;">
+                    Quero salvar esses dados como meu perfil neste navegador.
+                </label>
+                <div id="perfilAviso" style="display:none; margin-top: 8px; font-size: 0.85em; color: #dc3545;">
+                    <span style="cursor:pointer; text-decoration: underline;" onclick="limparPerfilSalvo()">Clique aqui para remover o perfil salvo</span>
+                </div>
+            </div>
+
             <div class="form-group" style="margin-bottom: 15px;">
-                <label for="cadastroEmail">E-mail de contato:</label>
-                <input type="email" id="cadastroEmail" placeholder="joao@email.com" style="width: 100%; padding: 8px; margin-top: 5px;">
+                <label for="relato">Sua curiosidade ou história:</label>
+                <textarea id="relato" placeholder="Escreva aqui o que você sabe ou viveu em Roncador..." required style="width: 100%; height: 120px; padding: 8px; margin-top: 5px; resize: vertical;"></textarea>
             </div>
-            
-            <button type="button" class="btn-submit" onclick="salvarPerfilOpcional(document.getElementById('cadastroNome').value.trim(), document.getElementById('cadastroEmail').value.trim())">Salvar Perfil</button>
-            <button type="button" style="background:#dc3545; color:white; border:none; padding:6px 12px; cursor:pointer; margin-left: 10px; border-radius: 4px;" onclick="limparPerfilOpcional()">Limpar Cadastro</button>
-        </div>
 
-        <div class="comentario-box" style="border: 1px solid #eee; padding: 20px; border-radius: 8px;">
-            <h3 style="margin-top: 0;">2. Conte uma Curiosidade ou Fato sobre Roncador</h3>
-            <p style="font-size: 0.9em; color: #666;">Espaço para compartilhar memórias, fotos antigas, histórias ou dados sobre o município.</p>
-            
-            <form id="storyForm">
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label for="nome">Nome Completo (Opcional):</label>
-                    <input type="text" id="nome" placeholder="Seu nome (Deixe em branco para Anônimo)" style="width: 100%; padding: 8px; margin-top: 5px;">
-                </div>
-
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <label for="email">E-mail de contato:</label>
-                    <input type="email" id="email" placeholder="exemplo@gmail.com" style="width: 100%; padding: 8px; margin-top: 5px;">
-                </div>
-
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="relato">Sua curiosidade ou história:</label>
-                    <textarea id="relato" placeholder="Escreva aqui o que você sabe ou viveu em Roncador..." required style="width: 100%; height: 120px; padding: 8px; margin-top: 5px; resize: vertical;"></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit" style="width: 100%; padding: 10px; font-weight: bold;">Enviar Curiosidade</button>
-            </form>
-        </div>
+            <button type="submit" class="btn-submit" style="width: 100%; padding: 10px; font-weight: bold;">Enviar Curiosidade</button>
+        </form>
     </div>
 
     <div class="comments-section">
@@ -473,24 +463,24 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         carregarComentarios();
-        verificarPerfilSalvo(); 
+        verificarPerfilExistente(); 
     });
 
-    // --- LÓGICA DE ENVIO DO COMENTÁRIO/CURIOSIDADE ---
+    // --- ENVIAR COMENTÁRIO E TRATAR CADASTRO ---
     document.getElementById('storyForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
         let nomeInput = document.getElementById('nome').value.trim();
+        let emailInput = document.getElementById('email').value.trim();
         let relatoInput = document.getElementById('relato').value.trim();
+        let desejaSalvar = document.getElementById('salvarCadastro').checked;
         
-        // Verifica o cadastro opcional se o campo manual de nome estiver em branco
-        let perfilSalvo = JSON.parse(localStorage.getItem('perfilRoncador'));
-        let nomeAutor = "Anônimo";
-        
-        if (nomeInput) {
-            nomeAutor = nomeInput;
-        } else if (perfilSalvo && perfilSalvo.nome) {
-            nomeAutor = perfilSalvo.nome;
+        let nomeAutor = nomeInput ? nomeInput : "Anônimo";
+
+        // Se o usuário marcou para salvar o cadastro/perfil
+        if (desejaSalvar && nomeInput) {
+            let perfil = { nome: nomeInput, email: emailInput };
+            localStorage.setItem('perfilRoncador', JSON.stringify(perfil));
         }
 
         let idUnico = Date.now();
@@ -500,14 +490,22 @@
             texto: relatoInput
         };
 
+        // Salva controle de criador e envia para o storage
         salvarComoCriadorLocal(idUnico);
         salvarNoStorage(objetoComentario);
+        
+        // Atualiza a lista na tela
         carregarComentarios(); 
         
-        document.getElementById('storyForm').reset();
-        verificarPerfilSalvo(); // Reseta mantendo o placeholder customizado
-    });
-
+        // Limpa apenas o campo de texto do relato, preservando os dados se o perfil estiver salvo
+        document.getElementById('relato').value = "";
+        
+        verificarPerfilExistente();
+        alert("Curiosidade enviada com sucesso!");
+    </script>
+       
+        <script>
+    // --- FUNÇÕES AUXILIARES DE RENDERIZAÇÃO E STORAGE ---
     function criarElementoComentario(comentario) {
         let novoComentario = document.createElement('div');
         novoComentario.className = 'comment-card';
@@ -586,44 +584,35 @@
         }
     }
 
-    // --- LÓGICA DO CADASTRO OPCIONAL DE PERFIL ---
-    function salvarPerfilOpcional(nome, email) {
-        if(!nome) {
-            alert("Por favor, digite ao menos um nome para salvar seu perfil.");
-            return;
-        }
-        let perfil = { nome: nome, email: email };
-        localStorage.setItem('perfilRoncador', JSON.stringify(perfil));
-        
-        verificarPerfilSalvo();
-        alert("Cadastro efetuado! Seus comentários usarão este perfil por padrão.");
-    }
-
-    function limparPerfilOpcional() {
-        localStorage.removeItem('perfilRoncador');
-        document.getElementById('cadastroNome').value = "";
-        document.getElementById('cadastroEmail').value = "";
-        
-        let inputNomeRelato = document.getElementById('nome');
-        if (inputNomeRelato) {
-            inputNomeRelato.placeholder = "Seu nome (Deixe em branco para Anônimo)";
-        }
-        alert("Cadastro removido.");
-        verificarPerfilSalvo();
-    }
-
-    function verificarPerfilSalvo() {
+    // --- GERENCIAMENTO DE CADASTRO UNIFICADO ---
+    function verificarPerfilExistente() {
         let perfilSalvo = JSON.parse(localStorage.getItem('perfilRoncador'));
-        let inputNomeRelato = document.getElementById('nome');
-        
-        if (perfilSalvo && perfilSalvo.nome) {
-            if(document.getElementById('cadastroNome')) document.getElementById('cadastroNome').value = perfilSalvo.nome;
-            if(document.getElementById('cadastroEmail')) document.getElementById('cadastroEmail').value = perfilSalvo.email || "";
-            
-            if(inputNomeRelato) {
-                inputNomeRelato.placeholder = `Comentando como: ${perfilSalvo.nome} (Ou altere aqui)`;
+        let inputNome = document.getElementById('nome');
+        let inputEmail = document.getElementById('email');
+        let checkbox = document.getElementById('salvarCadastro');
+        let aviso = document.getElementById('perfilAviso');
+
+        if (perfilSalvo) {
+            if (inputNome) inputNome.value = perfilSalvo.nome;
+            if (inputEmail) inputEmail.value = perfilSalvo.email || "";
+            if (checkbox) {
+                checkbox.checked = true;
+                checkbox.disabled = true; // Trava para mostrar que já está ativo
             }
+            if (aviso) aviso.style.display = "block"; // Mostra opção de deletar cadastro
+        } else {
+            if (checkbox) checkbox.disabled = false;
+            if (aviso) aviso.style.display = "none";
         }
+    }
+
+    function limparPerfilSalvo() {
+        localStorage.removeItem('perfilRoncador');
+        document.getElementById('nome').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('salvarCadastro').checked = false;
+        alert("Cadastro removido com sucesso.");
+        verificarPerfilExistente();
     }
 </script>
 
