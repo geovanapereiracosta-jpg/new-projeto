@@ -1,3 +1,345 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roncador - PR</title>
+    <style>
+        /* Reset e Configurações Gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: rgb(231, 231, 231);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Menu de Navegação Fixo */
+        .cabecalho {
+            background-color: #222;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .cabecalho .logo a {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .cabecalho .menu-navegacao ul {
+            display: flex;
+            list-style: none;
+        }
+
+        .cabecalho .menu-navegacao ul li {
+            margin-left: 30px;
+        }
+
+        .cabecalho .menu-navegacao ul li a {
+            color: #ddd;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .cabecalho .menu-navegacao ul li a:hover {
+            color: #fff;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px; /* Compensação do menu fixo */
+        }
+
+        h1 {
+            text-align: center;
+            background-color: #d3d3d3; 
+            color: #333;              
+            padding: 20px;            
+            border-radius: 8px;       
+            max-width: 600px;          
+            margin: 20px auto;         
+        }
+
+        h2, h3, h4 {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            text-align: justify;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+
+        /* Galeria de Imagens */
+        .gallery {
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; 
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .gallery img {
+            max-width: 100%; 
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Listas */
+        ul, ol {
+            background-color: #ffffff;
+            padding: 30px 50px;       
+            border-radius: 10px;      
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        ul ul, ol ul {
+            background-color: transparent;
+            margin: 10px 0;
+            padding: 0 20px;
+            box-shadow: none;
+        }
+
+        /* Vídeo Centralizado */
+        .video-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        iframe {
+            border: none;
+            border-radius: 8px;
+            max-width: 100%;
+        }
+
+        /* Formulário de Cadastro */
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin: 40px 0 20px 0;
+        }
+
+        .form-container p {
+            text-align: center;
+            font-size: 15px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 120px;
+        }
+
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+
+        /* Seção de Comentários / Relatos */
+        .comments-section {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+        }
+
+        .comment-card {
+            position: relative;
+            background-color: #f9f9f9;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            border-top: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .comment-text {
+            font-size: 15px;
+            color: #555;
+            margin: 0;
+            text-align: left;
+            padding-right: 70px;
+        }
+
+        .btn-delete {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background-color: #cc0000;
+        }
+
+        /* Rodapé Prefeitura */
+        .site-footer {
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px 40px;
+            border-top: 3px solid #28a745; 
+            margin-top: 60px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-table {
+            border-collapse: collapse;
+            max-width: 700px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-table th {
+            font-size: 1.2rem;
+            color: #28a745;
+            text-align: left;
+            padding-bottom: 10px;
+            background-color: transparent;
+        }
+
+        .footer-table td {
+            padding: 6px 12px 6px 0;
+            vertical-align: top;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .footer-table .label {
+            font-weight: bold;
+            color: #555;
+            white-space: nowrap;
+            width: 180px;
+        }
+
+        .footer-table a {
+            color: #00b333;
+            text-decoration: none;
+        }
+
+        .footer-table a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-logo-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            flex: 1;
+            min-width: 350px;
+        }
+
+        .footer-logo {
+            max-width: 350px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.85rem;
+            color: #777;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="cabecalho">
+        <div class="logo">
+            <a href="#">Roncador</a>
+        </div>
+        <nav class="menu-navegacao">
+            <ul>
+                <li><a href="#historia">História</a></li>
+                <li><a href="#curiosidades">Curiosidades</a></li>
+                <li><a href="#turismo">O que fazer</a></li>
+                <li><a href="#relatos">Relatos</a></li>
+            </ul>
+        </nav>
+    </header>
+
 /* Galeria 
 .gallery {
     display: flex; 
