@@ -418,38 +418,72 @@
         <div class="video-container">
             <iframe width="560" height="315" src="https://www.youtube.com/embed/YU2yU1rTWfw?si=bkKgxBZ9ojRinGgD" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
-  
-<div class="form-container" style="margin-bottom: 20px; border: 1px dashed #ccc; padding: 15px;">
-    <h3>Cadastro Opcional de Historiador / Morador</h3>
-    <p><small>Se quiser, salve seus dados aqui para assinar suas curiosidades e fatos sobre Roncador automaticamente.</small></p>
-    
-    <div class="form-group">
-        <label for="cadastroNome">Seu Nome ou Apelido:</label>
-        <input type="text" id="cadastroNome" placeholder="Ex: João Silva">
+
+<section id="relatos">
+    <div class="form-container">
+        
+        <div class="cadastro-box" style="margin-bottom: 25px; border: 1px dashed #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
+            <h3 style="margin-top: 0;">1. Cadastro Opcional (Salvar meus dados)</h3>
+            <p style="font-size: 0.9em; color: #666;">Se quiser, salve seu nome aqui para assinar suas curiosidades automaticamente sem precisar digitar toda vez.</p>
+            
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label for="cadastroNome">Seu Nome ou Apelido:</label>
+                <input type="text" id="cadastroNome" placeholder="Ex: João Silva" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="cadastroEmail">E-mail de contato:</label>
+                <input type="email" id="cadastroEmail" placeholder="joao@email.com" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+            
+            <button type="button" class="btn-submit" onclick="salvarPerfilOpcional(document.getElementById('cadastroNome').value.trim(), document.getElementById('cadastroEmail').value.trim())">Salvar Perfil</button>
+            <button type="button" style="background:#dc3545; color:white; border:none; padding:6px 12px; cursor:pointer; margin-left: 10px; border-radius: 4px;" onclick="limparPerfilOpcional()">Limpar Cadastro</button>
+        </div>
+
+        <div class="comentario-box" style="border: 1px solid #eee; padding: 20px; border-radius: 8px;">
+            <h3 style="margin-top: 0;">2. Conte uma Curiosidade ou Fato sobre Roncador</h3>
+            <p style="font-size: 0.9em; color: #666;">Espaço para compartilhar memórias, fotos antigas, histórias ou dados sobre o município.</p>
+            
+            <form id="storyForm">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="nome">Nome Completo (Opcional):</label>
+                    <input type="text" id="nome" placeholder="Seu nome (Deixe em branco para Anônimo)" style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="email">E-mail de contato:</label>
+                    <input type="email" id="email" placeholder="exemplo@gmail.com" style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="relato">Sua curiosidade ou história:</label>
+                    <textarea id="relato" placeholder="Escreva aqui o que você sabe ou viveu em Roncador..." required style="width: 100%; height: 120px; padding: 8px; margin-top: 5px; resize: vertical;"></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit" style="width: 100%; padding: 10px; font-weight: bold;">Enviar Curiosidade</button>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="cadastroEmail">E-mail de contato:</label>
-        <input type="email" id="cadastroEmail" placeholder="joao@email.com">
+
+    <div class="comments-section">
+        <h3>Curiosidades da Comunidade</h3>
+        <div id="commentsContainer"></div>
     </div>
-    
-    <button type="button" class="btn-submit" onclick="salvarPerfilOpcional(document.getElementById('cadastroNome').value.trim(), document.getElementById('cadastroEmail').value.trim())">Salvar Perfil</button>
-    <button type="button" style="background:#dc3545; color:white; border:none; padding:5px 10px; cursor:pointer; margin-left: 10px;" onclick="limparPerfilOpcional()">Limpar Cadastro</button>
-</div>
+</section>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         carregarComentarios();
-        verificarPerfilSalvo(); // Verifica se o usuário já tem cadastro opcional
+        verificarPerfilSalvo(); 
     });
 
-    // --- LÓGICA DO FORMULÁRIO DE RELATOS/CURIOSIDADES ---
+    // --- LÓGICA DE ENVIO DO COMENTÁRIO/CURIOSIDADE ---
     document.getElementById('storyForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
         let nomeInput = document.getElementById('nome').value.trim();
         let relatoInput = document.getElementById('relato').value.trim();
         
-        // Se o input manual estiver vazio, tenta usar o nome do cadastro opcional. Se não houver, usa "Anônimo".
+        // Verifica o cadastro opcional se o campo manual de nome estiver em branco
         let perfilSalvo = JSON.parse(localStorage.getItem('perfilRoncador'));
         let nomeAutor = "Anônimo";
         
@@ -471,7 +505,7 @@
         carregarComentarios(); 
         
         document.getElementById('storyForm').reset();
-        verificarPerfilSalvo(); // Re-aplica o placeholder customizado caso haja perfil salvo
+        verificarPerfilSalvo(); // Reseta mantendo o placeholder customizado
     });
 
     function criarElementoComentario(comentario) {
@@ -552,7 +586,7 @@
         }
     }
 
-    // --- LÓGICA DO CADASTRO OPCIONAL DO PERFIL ---
+    // --- LÓGICA DO CADASTRO OPCIONAL DE PERFIL ---
     function salvarPerfilOpcional(nome, email) {
         if(!nome) {
             alert("Por favor, digite ao menos um nome para salvar seu perfil.");
@@ -561,12 +595,8 @@
         let perfil = { nome: nome, email: email };
         localStorage.setItem('perfilRoncador', JSON.stringify(perfil));
         
-        // Preenche também o campo de cadastro para dar feedback visual de salvo
-        document.getElementById('cadastroNome').value = nome;
-        document.getElementById('cadastroEmail').value = email;
-        
         verificarPerfilSalvo();
-        alert("Cadastro salvo localmente! Seus próximos comentários usarão esse nome automaticamente.");
+        alert("Cadastro efetuado! Seus comentários usarão este perfil por padrão.");
     }
 
     function limparPerfilOpcional() {
@@ -587,13 +617,11 @@
         let inputNomeRelato = document.getElementById('nome');
         
         if (perfilSalvo && perfilSalvo.nome) {
-            // Atualiza os campos do formulário de cadastro caso a página seja recarregada
             if(document.getElementById('cadastroNome')) document.getElementById('cadastroNome').value = perfilSalvo.nome;
             if(document.getElementById('cadastroEmail')) document.getElementById('cadastroEmail').value = perfilSalvo.email || "";
             
-            // Muda o placeholder do formulário de comentários principal
             if(inputNomeRelato) {
-                inputNomeRelato.placeholder = `Comentando como: ${perfilSalvo.nome} (Ou digite outro)`;
+                inputNomeRelato.placeholder = `Comentando como: ${perfilSalvo.nome} (Ou altere aqui)`;
             }
         }
     }
