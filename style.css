@@ -1,0 +1,16 @@
+/* Galeria 
+.gallery {
+    display: flex; 
+    gap: 15px; 
+    justify-content: center; 
+    flex-wrap: nowrap; /* Garante que fiquem na mesma linha */
+    margin: 30px 0;
+}
+
+.gallery img {
+    flex: 1; /* Faz com que as duas imagens dividam o espaço igualmente */
+    max-width: calc(50% - 8px); /* Limita o tamanho máximo a metade do container menos o espaçamento */
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    object-fit: cover; /* Garante que as imagens fiquem alinhadas mesmo se tiverem proporções diferentes */
