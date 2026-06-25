@@ -360,7 +360,7 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     object-fit: cover; /* Garante que as imagens fiquem alinhadas mesmo se tiverem proporções diferentes */
 
-    <div class="container">
+    <div> class="container">
         <section id="historia">
             <h1>História de Roncador</h1>
             <p>Por volta de 1920, uma comissão exploradora encarregada de demarcar a estrada que faria a ligação do Paraná ao Mato Grosso, instalou um acampamento onde hoje se localiza a sede do município de Roncador. Com a derrubada das matas, foram surgindo as primeiras plantações, como também as criações de suínos.</p>
@@ -369,29 +369,11 @@
 
             <p>A colonização de Roncador iniciou-se em 1923, com a chegada das primeiras famílias. Em 1927, foi construída a primeira estrada para carroças. Devido ao crescimento do vilarejo, em 1952, a congregação das irmãs Servas da Imaculada Virgem Maria abreu uma escola, cuja construção contou com ajuda de toda população.</p>
 
-           <style>
-        /* O Flexbox alinha os elementos filhos em linha por padrão */
-        .gallery {
-            display: flex;
-            gap: 20px; /* Cria um espaço de 20px entre as duas imagens */
-            justify-content: flex-start; /* Alinha as imagens no início da linha */
-            flex-wrap: wrap; /* Garante que o layout não quebre em telas muito pequenas (celulares) */
-        }
+        <div class="gallery">
+    <img src="roncador.jpeg" alt="Imagem de Roncador" width="380">
+    <img src="escolaroncador.jpg" alt="Primeira Escola de Roncador" width="380">
+</div>
 
-        /* Opcional: faz com que as imagens fiquem responsivas */
-        .gallery img {
-            max-width: 100%;
-            height: auto;
-        }
-    </style>
-
-    <div >class="container">
-            <div class="gallery">
-                <img src="roncador.jpeg" alt="Imagem de Roncador" width="380">
-                <img src="escolaroncador.jpg" alt="Primeira Escola de Roncador" width="380">
-            </div>
-        </section>
-    
         <section id="curiosidades">
             <h2>Curiosidades sobre Roncador:</h2>
             <ul>
